@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 
+// Função principal do componente App
 function App() {
+  // Define o estado inicial do formulário,
+  // um objeto contendo todos os campos vazios
   const initialFormData = {
     nome: "",
     sobrenome: "",
@@ -12,18 +15,25 @@ function App() {
     idade: 0,
   };
 
+  // Define o estado do formulário (`formData`) e
+  // o estado dos erros (`errors`), ambos inicializados
+  // com valores do estado inicial
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
 
+  // Função para lidar com a mudança de qualquer campo do formulário
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value } = e.target; // Extrai o nome e valor do campo alterado
 
+    // Verifica o nome do campo para aplicar validação específica
     if (name === "nome" || name === "sobrenome" || name === "endereco") {
+      // Para esses campos, permite apenas letras e espaços
       setFormData((prevData) => ({
-        ...prevData,
-        [name]: value.replace(/[^a-zA-Z ]/g, ""),
+        ...prevData, // Mantém os dados anteriores
+        [name]: value.replace(/[^a-zA-Z ]/g, ""), // Substitui caracteres inválidos por vazio
       }));
     } else if (name === "cpf") {
+      // Para CPF, permite apenas números e limita o tamanho a 11 caracteres
       if (/^\d*$/.test(value) && value.length <= 11) {
         setFormData((prevData) => ({
           ...prevData,
@@ -31,11 +41,13 @@ function App() {
         }));
       }
     } else if (name === "salario") {
+      // Para salário, permite apenas números
       setFormData((prevData) => ({
         ...prevData,
         [name]: value.replace(/\D/g, ""),
       }));
     } else {
+      // Para outros campos, atualiza o valor normalmente
       setFormData((prevData) => ({
         ...prevData,
         [name]: value,
@@ -43,20 +55,24 @@ function App() {
     }
   };
 
+  // Função para calcular a idade a partir da data de nascimento
   const calculateAge = (date) => {
-    const birthDate = new Date(date);
+    const birthDate = new Date(date); // Converte a data para objeto Date
     const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const month = today.getMonth() - birthDate.getMonth();
+    let age = today.getFullYear() - birthDate.getFullYear(); // Diferença de anos
+    const month = today.getMonth() - birthDate.getMonth(); // Diferença de meses
+    // Corrige a idade se o mês de nascimento ainda não passou no ano atual
     if (month < 0 || (month === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
     return age;
   };
 
+  // Função para lidar com o envio do formulário
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Evita o comportamento padrão do submit (recarregar a página)
 
+    // Define uma lista de campos obrigatórios
     const requiredFields = [
       "nome",
       "sobrenome",
@@ -66,22 +82,29 @@ function App() {
       "salario",
       "dataNascimento",
     ];
+    // Inicializa um objeto vazio para armazenar erros de validação
     let formErrors = {};
 
+    // Verifica se todos os campos obrigatórios estão preenchidos
     requiredFields.forEach((field) => {
       if (!formData[field]) {
         formErrors[field] = "Este campo é obrigatório";
       }
     });
 
+    // Valida o CPF (verifica o tamanho)
     if (formData.cpf.length !== 11) {
       formErrors.cpf = "O CPF deve conter 11 dígitos";
     }
 
+    // Verifica se existem erros de validação
     if (Object.keys(formErrors).length > 0) {
+      // Se houver erros, atualiza o estado de erros para exibi-los
       setErrors(formErrors);
     } else {
+      // Se não houver erros, calcula a idade
       const idadeCalculada = calculateAge(formData.dataNascimento);
+      // Cria um novo objeto com os dados do formulário e a idade calculada
       const finalFormData = { ...formData, idade: idadeCalculada };
       setErrors({});
       console.log(JSON.stringify(finalFormData, null, 2));
