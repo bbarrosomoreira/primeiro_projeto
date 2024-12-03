@@ -1,106 +1,152 @@
-import React, { useState } from "react"; // Importa o React e o hook useState.
-import "./Formulario.css"; // Importa o CSS do formulário.
+import React, { useState } from "react";
 import {
-  validarCampoVazio,
   validarNome,
-  validarEmail,
-  validarSelecao,
-} from "./validacoes"; // Importa as funções de validação.
+  validarCPF,
+  validarEndereco,
+  validarSalario,
+  validarDataNascimento,
+} from "../utils/validacoes"; // Importando as funções de validação
+import "../styles/Formulario.css"; // Importando o arquivo de estilos CSS
 
-/**
- * Componente do formulário principal.
- */
-function Formulario() {
-  // Estados para armazenar os valores dos campos.
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [opcao, setOpcao] = useState("");
+const Formulario = () => {
+  const [formData, setFormData] = useState({
+    nome: "",
+    sobrenome: "",
+    cpf: "",
+    endereco: "",
+    salario: "",
+    dataNascimento: "",
+  });
 
-  // Estados para armazenar mensagens de erro.
-  const [erroNome, setErroNome] = useState(null);
-  const [erroEmail, setErroEmail] = useState(null);
-  const [erroOpcao, setErroOpcao] = useState(null);
+  const [erros, setErros] = useState({});
 
-  /**
-   * Lida com o envio do formulário.
-   * Realiza as validações antes de permitir o envio.
-   * @param {Event} evento - O evento de submissão do formulário.
-   */
-  function aoEnviarFormulario(evento) {
-    evento.preventDefault(); // Previne o recarregamento da página ao enviar.
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    // Validações antes de enviar.
-    const erroValidacaoNome = validarNome(nome);
-    const erroValidacaoEmail = validarEmail(email);
-    const erroValidacaoOpcao = validarSelecao(opcao);
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-    setErroNome(erroValidacaoNome);
-    setErroEmail(erroValidacaoEmail);
-    setErroOpcao(erroValidacaoOpcao);
+    let valid = true;
+    let erros = {};
 
-    // Verifica se todos os campos estão válidos.
-    if (!erroValidacaoNome && !erroValidacaoEmail && !erroValidacaoOpcao) {
-      console.log("Formulário enviado com sucesso!");
-      console.log({ nome, email, opcao });
-
-      // Limpa os campos após o envio.
-      setNome("");
-      setEmail("");
-      setOpcao("");
-      alert("Formulário enviado com sucesso!");
+    const nomeErro = validarNome(formData.nome);
+    if (nomeErro) {
+      valid = false;
+      erros.nome = nomeErro;
     }
-  }
+
+    const cpfErro = validarCPF(formData.cpf);
+    if (cpfErro) {
+      valid = false;
+      erros.cpf = cpfErro;
+    }
+
+    const enderecoErro = validarEndereco(formData.endereco);
+    if (enderecoErro) {
+      valid = false;
+      erros.endereco = enderecoErro;
+    }
+
+    const salarioErro = validarSalario(formData.salario);
+    if (salarioErro) {
+      valid = false;
+      erros.salario = salarioErro;
+    }
+
+    const dataNascimentoErro = validarDataNascimento(formData.dataNascimento);
+    if (dataNascimentoErro) {
+      valid = false;
+      erros.dataNascimento = dataNascimentoErro;
+    }
+
+    setErros(erros);
+
+    if (valid) {
+      console.log("Formulário enviado com sucesso", formData);
+    }
+  };
 
   return (
-    <form className="formulario" onSubmit={aoEnviarFormulario}>
-      {/* Campo Nome */}
-      <div className="campo">
-        <label htmlFor="nome">Nome:</label>
-        <input
-          type="text"
-          id="nome"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          placeholder="Digite seu nome"
-        />
-        {erroNome && <span className="erro">{erroNome}</span>}
-      </div>
+    <div className="formulario-container">
+      <h1>Bem-vindo ao Meu Formulário</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="campo">
+          <label>Nome:</label>
+          <input
+            type="text"
+            name="nome"
+            value={formData.nome}
+            onChange={handleChange}
+          />
+          {erros.nome && <div className="erro">{erros.nome}</div>}
+        </div>
 
-      {/* Campo E-mail */}
-      <div className="campo">
-        <label htmlFor="email">E-mail:</label>
-        <input
-          type="email"
-          id="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="Digite seu e-mail"
-        />
-        {erroEmail && <span className="erro">{erroEmail}</span>}
-      </div>
+        <div className="campo">
+          <label>Sobrenome:</label>
+          <input
+            type="text"
+            name="sobrenome"
+            value={formData.sobrenome}
+            onChange={handleChange}
+          />
+        </div>
 
-      {/* Campo Dropdown */}
-      <div className="campo">
-        <label htmlFor="opcao">Selecione uma opção:</label>
-        <select
-          id="opcao"
-          value={opcao}
-          onChange={(e) => setOpcao(e.target.value)}
-        >
-          <option value="">Selecione</option>
-          <option value="opcao1">Opção 1</option>
-          <option value="opcao2">Opção 2</option>
-          <option value="opcao3">Opção 3</option>
-        </select>
-        {erroOpcao && <span className="erro">{erroOpcao}</span>}
-      </div>
+        <div className="campo">
+          <label>CPF:</label>
+          <input
+            type="text"
+            name="cpf"
+            value={formData.cpf}
+            onChange={handleChange}
+          />
+          {erros.cpf && <div className="erro">{erros.cpf}</div>}
+        </div>
 
-      {/* Botão de Envio */}
-      <button type="submit" className="botao">
-        Enviar
-      </button>
-    </form>
+        <div className="campo">
+          <label>Endereço:</label>
+          <input
+            type="text"
+            name="endereco"
+            value={formData.endereco}
+            onChange={handleChange}
+          />
+          {erros.endereco && <div className="erro">{erros.endereco}</div>}
+        </div>
+
+        <div className="campo">
+          <label>Salário:</label>
+          <input
+            type="number"
+            name="salario"
+            value={formData.salario}
+            onChange={handleChange}
+          />
+          {erros.salario && <div className="erro">{erros.salario}</div>}
+        </div>
+
+        <div className="campo">
+          <label>Data de Nascimento:</label>
+          <input
+            type="date"
+            name="dataNascimento"
+            value={formData.dataNascimento}
+            onChange={handleChange}
+          />
+          {erros.dataNascimento && (
+            <div className="erro">{erros.dataNascimento}</div>
+          )}
+        </div>
+
+        <button type="submit">Enviar</button>
+      </form>
+
+      <div>
+        <h2>Informações Enviadas:</h2>
+        <pre>{JSON.stringify(formData, null, 2)}</pre>
+      </div>
+    </div>
   );
-}
+};
 
 export default Formulario;

@@ -1,75 +1,103 @@
-// Validações.js
-// Este arquivo contém funções de validação reutilizáveis para o formulário.
-
 /**
- * Verifica se um campo está vazio.
- * @param {string} valor - O valor do campo a ser validado.
- * @returns {string|null} - Retorna uma mensagem de erro ou null se válido.
+ * Valida se um campo está vazio.
+ * @param {string} valor - O valor do campo.
+ * @returns {string|null} - Mensagem de erro ou null se válido.
  */
 export function validarCampoVazio(valor) {
   if (!valor.trim()) {
-    return "Este campo não pode ficar vazio.";
+    return "Este campo não pode estar vazio.";
   }
   return null;
 }
 
 /**
- * Valida se um nome tem o tamanho mínimo de caracteres.
- * @param {string} nome - O nome a ser validado.
- * @returns {string|null} - Retorna uma mensagem de erro ou null se válido.
+ * Valida o nome e o sobrenome.
+ * @param {string} nome - Nome ou sobrenome a ser validado.
+ * @returns {string|null} - Mensagem de erro ou null se válido.
  */
 export function validarNome(nome) {
-  if (nome.length < 3) {
+  if (!nome.trim()) {
+    return "O nome é obrigatório.";
+  }
+  if (nome.trim().length < 3) {
     return "O nome deve ter pelo menos 3 caracteres.";
   }
   return null;
 }
 
 /**
- * Valida um e-mail com base em um padrão de regex.
- * @param {string} email - O e-mail a ser validado.
- * @returns {string|null} - Retorna uma mensagem de erro ou null se válido.
+ * Valida o CPF.
+ * @param {string} cpf - CPF a ser validado.
+ * @returns {string|null} - Mensagem de erro ou null se válido.
  */
-export function validarEmail(email) {
-  const padraoEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regex para validar e-mails
-  if (!padraoEmail.test(email)) {
-    return "Digite um e-mail válido.";
+export function validarCPF(cpf) {
+  const cpfFormatado = cpf.replace(/\D/g, ""); // Remove caracteres não numéricos
+  if (!cpfFormatado || cpfFormatado.length !== 11) {
+    return "O CPF deve conter 11 números.";
   }
   return null;
 }
 
 /**
- * Valida a seleção de um item em um campo de dropdown.
- * @param {string} valor - O valor selecionado no dropdown.
- * @returns {string|null} - Retorna uma mensagem de erro ou null se válido.
+ * Valida o endereço.
+ * @param {string} endereco - Endereço a ser validado.
+ * @returns {string|null} - Mensagem de erro ou null se válido.
  */
-export function validarSelecao(valor) {
-  if (!valor || valor === "Selecione") {
-    return "Por favor, selecione uma opção válida.";
+export function validarEndereco(endereco) {
+  if (!endereco.trim()) {
+    return "O endereço é obrigatório.";
   }
   return null;
 }
 
 /**
- * Valida se um número está dentro de um intervalo especificado.
- * @param {number} numero - O número a ser validado.
- * @param {number} min - O valor mínimo permitido.
- * @param {number} max - O valor máximo permitido.
- * @returns {string|null} - Retorna uma mensagem de erro ou null se válido.
+ * Valida o salário.
+ * @param {string} salario - Salário a ser validado.
+ * @returns {string|null} - Mensagem de erro ou null se válido.
  */
-export function validarNumeroIntervalo(numero, min, max) {
-  if (numero < min || numero > max) {
-    return `O número deve estar entre ${min} e ${max}.`;
+export function validarSalario(salario) {
+  const valor = parseFloat(salario);
+  if (isNaN(valor) || valor <= 0) {
+    return "O salário deve ser um valor numérico positivo.";
   }
   return null;
 }
 
 /**
- * Exemplo de validação customizada. (Opcional, adaptável a necessidades específicas)
- * @param {string} valor - O valor do campo.
- * @returns {string|null} - Mensagem de erro ou null.
+ * Valida a data de nascimento.
+ * @param {string} dataNascimento - Data no formato AAAA-MM-DD.
+ * @returns {string|null} - Mensagem de erro ou null se válido.
  */
-export function validarCustomizado(valor) {
-  // Adicione sua lógica específica aqui, se necessário.
+export function validarDataNascimento(dataNascimento) {
+  if (!dataNascimento) {
+    return "A data de nascimento é obrigatória.";
+  }
+  const dataAtual = new Date();
+  const dataInformada = new Date(dataNascimento);
+
+  if (dataInformada > dataAtual) {
+    return "A data de nascimento não pode ser no futuro.";
+  }
   return null;
+}
+
+/**
+ * Função para calcular a idade com base na data de nascimento.
+ * @param {string} dataNascimento - Data de nascimento no formato AAAA-MM-DD.
+ * @returns {number} - A idade calculada.
+ */
+export function calcularIdade(dataNascimento) {
+  const hoje = new Date();
+  const nascimento = new Date(dataNascimento);
+  let idade = hoje.getFullYear() - nascimento.getFullYear();
+  const mes = hoje.getMonth();
+  const dia = hoje.getDate();
+
+  if (
+    mes < nascimento.getMonth() ||
+    (mes === nascimento.getMonth() && dia < nascimento.getDate())
+  ) {
+    idade--;
+  }
+  return idade;
 }
